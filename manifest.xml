@@ -1,0 +1,9 @@
+<package>
+  <description brief="Orocos rtt_dot-service package">
+    This package contains the components of the rtt_dot-service package
+  </description>
+  <license>LGPLv2.1/BSD</license>
+  <author>Steven Bellens - steven.bellens@mech.kuleuven.be</author>
+
+  <depend package="rtt" />
+</package>

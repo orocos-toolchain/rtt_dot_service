@@ -1,0 +1,17 @@
+/**
+\mainpage
+\htmlinclude manifest.html
+
+\b The RTT dot service allows you to generate dot syntax showing deployed OROCOS components and their connections. To use it, load the service in your Deployer component, e.g. in your .ops script, add:
+<code>
+import ("rtt_dot")
+loadService("Deployer","dot")
+</code>
+
+The service has one property, dot_file, which you can adjust to the file you like to be generated. Generation is triggered by calling dot.generate, or by an update of the Deployer component.
+
+Afterwards, visualisation of the dot file is possible, e.g. with the ROS xdot tool:
+
+rosrun xdot xdot.py orograph.dot
+
+*/
