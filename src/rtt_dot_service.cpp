@@ -35,11 +35,11 @@
 *                                                                             *
 *******************************************************************************/
 
-#include "rtt_dot-service.hpp"
+#include "rtt_dot_service.hpp"
 #include <boost/algorithm/string.hpp>
 #include <fstream>
 
-Dot::Dot(TaskContext* owner) 
+Dot::Dot(TaskContext* owner)
     : Service("dot", owner), base::ExecutableInterface()
     ,m_dot_file("orograph.dot")
 {

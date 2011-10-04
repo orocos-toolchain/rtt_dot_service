@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6.3)
 
-project(rtt_dot)
+project(rtt_dot_service)
 
 set (ROS_ROOT $ENV{ROS_ROOT} )
 if (ROS_ROOT)
@@ -18,5 +18,5 @@ find_package(OROCOS-RTT REQUIRED ${RTT_HINTS})
 
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
-orocos_service(rtt_dot-service src/rtt_dot-service.cpp)
+orocos_service(rtt_dot_service src/rtt_dot_service.cpp)
 orocos_generate_package()
