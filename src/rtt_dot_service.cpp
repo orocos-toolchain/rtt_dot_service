@@ -58,12 +58,15 @@ bool Dot::execute(){
   m_dot.str("");
   m_dot << "digraph G { \n";
   m_dot << "rankdir=TB; \n";
+  // List all peers of this component
   std::vector<std::string> peerList = this->getOwner()->getPeerList();
+  // Add the component itself as well
   peerList.push_back(this->getOwner()->getName());
   if(peerList.size() == 0){
     log(Debug) << "Component has no peers!" << endlog();
   }
   std::vector<std::string> comp_ports;
+  // Loop over all peers + own component
   for(unsigned int i=0; i<peerList.size(); i++){
     log(Debug) << "Component: " << peerList[i] << endlog();
     // Get a pointer to the taskcontext, which can be either a peer or the component itself.
@@ -73,6 +76,7 @@ bool Dot::execute(){
     } else{
       tc = this->getOwner()->getPeer(peerList[i]);
     }
+    // Get the component state
     base::TaskCore::TaskState st;
     st = tc->getTaskState();
     log(Debug) << "This component has state: " << st << endlog();
@@ -86,9 +90,12 @@ bool Dot::execute(){
       case 5: color = "green"; break;
       case 6: color = "red"; break;
     }
+    // Draw component as ellipse with color according to its TaskState
     m_dot << peerList[i] << "[style=filled,color=" << color << "];\n";
     comp_ports.clear();
+    // Get all component ports
     comp_ports = tc->ports()->getPortNames();
+    // Loop over all ports
     for(unsigned int j=0; j < comp_ports.size(); j++){
       log(Debug) << "Ports: " << comp_ports[j] << endlog();
       // Only consider input ports
