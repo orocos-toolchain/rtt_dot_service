@@ -120,22 +120,25 @@ bool Dot::execute(){
         log(Debug) << "Connection ends at component: " << comp_out << endlog();
         // Only consider input ports
         if(dynamic_cast<base::InputPortInterface*>(tc->getPort(comp_ports[j])) != 0){
-          // If the ConnPolicy has a non-empty name, use that name as the topic name
-          if(!cp.name_id.empty()){
-            // plot the channel element as a seperate box and connect input and output with it
-            m_dot << "\"" << cp.name_id << "\"" << "[shape=box];\n";
-            m_dot << comp_in << "->" << "\"" << cp.name_id << "\"" << "[label=\"" << port_in << "\"];\n";
-            m_dot << "\"" << cp.name_id << "\"" << "->" << comp_out << "[label=\"" << port_out << "\"];\n";\
+          // First, consider regular connections
+          if(!comp_in.empty()){
+            // If the ConnPolicy has a non-empty name, use that name as the topic name
+            if(!cp.name_id.empty()){
+              // plot the channel element as a seperate box and connect input and output with it
+              m_dot << "\"" << cp.name_id << "\"" << "[shape=box];\n";
+              m_dot << comp_in << "->" << "\"" << cp.name_id << "\"" << "[label=\"" << port_in << "\"];\n";
+              m_dot << "\"" << cp.name_id << "\"" << "->" << comp_out << "[label=\"" << port_out << "\"];\n";\
+            }
+            // Else, use a custom name: compInName.compOutName
+            else{
+              // plot the channel element as a seperate box and connect input and output with it
+              m_dot << "\"" << comp_in << "." << comp_out << "\"[shape=box];\n";
+              m_dot << comp_in << "->" << "\"" << comp_in << "." << comp_out << "\"[label=\"" << port_in << "\"];\n";
+              m_dot << "\"" << comp_in << "." << comp_out << "\"->" << comp_out << "[label=\"" << port_out << "\"];\n";\
+            }
           }
-          // Else, use a custom name: compInName.compOutName
-          else if(!comp_in.empty() && !comp_out.empty()){
-            // plot the channel element as a seperate box and connect input and output with it
-            m_dot << "\"" << comp_in << "." << comp_out << "\"[shape=box];\n";
-            m_dot << comp_in << "->" << "\"" << comp_in << "." << comp_out << "\"[label=\"" << port_in << "\"];\n";
-            m_dot << "\"" << comp_in << "." << comp_out << "\"->" << comp_out << "[label=\"" << port_out << "\"];\n";\
-          }
-          // Looks like a stream, although cp.name_id is empty?!
-          else if(comp_in.empty() && !comp_out.empty()){
+          // Here, we have a stream?!
+          else{
             // plot the channel element as a seperate box and connect input and output with it
             m_dot << "\"." << comp_out << "\"[shape=box];\n";
             m_dot << "\"." << comp_out << "\"->" << comp_out << "[label=\"" << port_out << "\"];\n";\
@@ -149,6 +152,11 @@ bool Dot::execute(){
               // plot the channel element as a seperate box and connect input and output with it
               m_dot << "\"" << cp.name_id << "\"" << "[shape=box];\n";
               m_dot << comp_in << "->" << "\"" << cp.name_id << "\"" << "[label=\"" << port_in << "\"];\n";
+            }
+            else{
+              // plot the channel element as a seperate box and connect input and output with it
+              m_dot << "\"." << comp_in << "\"[shape=box];\n";
+              m_dot << comp_in << "->" << "\"." << comp_in << "\"[label=\"" << port_in << "\"];\n";
             }
           }
         }
