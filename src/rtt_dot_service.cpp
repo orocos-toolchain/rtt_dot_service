@@ -65,7 +65,19 @@ bool Dot::execute(){
   std::vector<std::string> comp_ports;
   for(unsigned int i=0; i<peerList.size(); i++){
     log(Debug) << "Component: " << peerList[i] << endlog();
-    m_dot << peerList[i] << ";\n";
+    base::TaskCore::TaskState st = this->getOwner()->getPeer(peerList[i])->getTaskState();
+    log(Debug) << "This component has state: " << st << endlog();
+    std::string color;
+    switch (st){
+      case 0: color = "white"; break;
+      case 1: color = "orange"; break;
+      case 2: color = "red"; break;
+      case 3: color = "red"; break;
+      case 4: color = "lightblue"; break;
+      case 5: color = "green"; break;
+      case 6: color = "red"; break;
+    }
+    m_dot << peerList[i] << "[style=filled,color=" << color << "];\n";
     comp_ports.clear();
     comp_ports = this->getOwner()->getPeer(peerList[i])->ports()->getPortNames();
     for(unsigned int j=0; j < comp_ports.size(); j++){
