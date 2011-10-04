@@ -98,28 +98,28 @@ bool Dot::execute(){
     // Loop over all ports
     for(unsigned int j=0; j < comp_ports.size(); j++){
       log(Debug) << "Port: " << comp_ports[j] << endlog();
-      // Only consider input ports
-      if(dynamic_cast<base::InputPortInterface*>(tc->getPort(comp_ports[j])) != 0){
-        std::list<internal::ConnectionManager::ChannelDescriptor> chns = tc->getPort(comp_ports[j])->getManager()->getChannels();
-        std::list<internal::ConnectionManager::ChannelDescriptor>::iterator k;
-        for(k=chns.begin(); k!= chns.end(); k++){
-          base::ChannelElementBase::shared_ptr bs = k->get<1>();
-          ConnPolicy cp = k->get<2>();
-          log(Debug) << "Connection id: " << cp.name_id << endlog();
-          std::string comp_in, port_in;
-          if(bs->getInputEndPoint()->getPort()!=0){
-            comp_in = bs->getInputEndPoint()->getPort()->getInterface()->getOwner()->getName();
-            port_in = bs->getInputEndPoint()->getPort()->getName();
-          }
-          log(Debug) << "Connection starts at port: " << port_in << endlog();
-          log(Debug) << "Connection starts at component: " << comp_in << endlog();
-          std::string comp_out, port_out;
-          if(bs->getOutputEndPoint()->getPort()!=0){
-            comp_out = bs->getOutputEndPoint()->getPort()->getInterface()->getOwner()->getName();
-            port_out = bs->getOutputEndPoint()->getPort()->getName();
-          }
-          log(Debug) << "Connection ends at port: " << port_out << endlog();
-          log(Debug) << "Connection ends at component: " << comp_out << endlog();
+      std::list<internal::ConnectionManager::ChannelDescriptor> chns = tc->getPort(comp_ports[j])->getManager()->getChannels();
+      std::list<internal::ConnectionManager::ChannelDescriptor>::iterator k;
+      for(k=chns.begin(); k!= chns.end(); k++){
+        base::ChannelElementBase::shared_ptr bs = k->get<1>();
+        ConnPolicy cp = k->get<2>();
+        log(Debug) << "Connection id: " << cp.name_id << endlog();
+        std::string comp_in, port_in;
+        if(bs->getInputEndPoint()->getPort()!=0){
+          comp_in = bs->getInputEndPoint()->getPort()->getInterface()->getOwner()->getName();
+          port_in = bs->getInputEndPoint()->getPort()->getName();
+        }
+        log(Debug) << "Connection starts at port: " << port_in << endlog();
+        log(Debug) << "Connection starts at component: " << comp_in << endlog();
+        std::string comp_out, port_out;
+        if(bs->getOutputEndPoint()->getPort()!=0){
+          comp_out = bs->getOutputEndPoint()->getPort()->getInterface()->getOwner()->getName();
+          port_out = bs->getOutputEndPoint()->getPort()->getName();
+        }
+        log(Debug) << "Connection ends at port: " << port_out << endlog();
+        log(Debug) << "Connection ends at component: " << comp_out << endlog();
+        // Only consider input ports
+        if(dynamic_cast<base::InputPortInterface*>(tc->getPort(comp_ports[j])) != 0){
           // If the ConnPolicy has a non-empty name, use that name as the topic name
           if(!cp.name_id.empty()){
             // plot the channel element as a seperate box and connect input and output with it
@@ -141,29 +141,7 @@ bool Dot::execute(){
             m_dot << "\"." << comp_out << "\"->" << comp_out << "[label=\"" << port_out << "\"];\n";\
           }
         }
-      }
-      else{
-        log(Debug) << "This is an output port" << endlog();
-        std::list<internal::ConnectionManager::ChannelDescriptor> chns = tc->getPort(comp_ports[j])->getManager()->getChannels();
-        std::list<internal::ConnectionManager::ChannelDescriptor>::iterator k;
-        for(k=chns.begin(); k!= chns.end(); k++){
-          base::ChannelElementBase::shared_ptr bs = k->get<1>();
-          ConnPolicy cp = k->get<2>();
-          log(Debug) << "Connection id: " << cp.name_id << endlog();
-          std::string comp_in, port_in;
-          if(bs->getInputEndPoint()->getPort()!=0){
-            comp_in = bs->getInputEndPoint()->getPort()->getInterface()->getOwner()->getName();
-            port_in = bs->getInputEndPoint()->getPort()->getName();
-          }
-          log(Debug) << "Connection starts at port: " << port_in << endlog();
-          log(Debug) << "Connection starts at component: " << comp_in << endlog();
-          std::string comp_out, port_out;
-          if(bs->getOutputEndPoint()->getPort()!=0){
-            comp_out = bs->getOutputEndPoint()->getPort()->getInterface()->getOwner()->getName();
-            port_out = bs->getOutputEndPoint()->getPort()->getName();
-          }
-          log(Debug) << "Connection ends at port: " << port_out << endlog();
-          log(Debug) << "Connection ends at component: " << comp_out << endlog();
+        else{
           // Consider only output ports that do not have a corresponding input port
           if(comp_out.empty()){
             // If the ConnPolicy has a non-empty name, use that name as the topic name
