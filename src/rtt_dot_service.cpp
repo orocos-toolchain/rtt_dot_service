@@ -57,15 +57,24 @@ std::string Dot::getOwnerName() {
 bool Dot::execute(){
   m_dot.str("");
   m_dot << "digraph G { \n";
-  m_dot << "rankdir=LR; \n";
+  m_dot << "rankdir=TB; \n";
   std::vector<std::string> peerList = this->getOwner()->getPeerList();
+  peerList.push_back(this->getOwner()->getName());
   if(peerList.size() == 0){
     log(Debug) << "Component has no peers!" << endlog();
   }
   std::vector<std::string> comp_ports;
   for(unsigned int i=0; i<peerList.size(); i++){
     log(Debug) << "Component: " << peerList[i] << endlog();
-    base::TaskCore::TaskState st = this->getOwner()->getPeer(peerList[i])->getTaskState();
+    // Get a pointer to the taskcontext, which can be either a peer or the component itself.
+    TaskContext* tc;
+    if(this->getOwner()->getPeer(peerList[i])==0){
+      tc = this->getOwner();
+    } else{
+      tc = this->getOwner()->getPeer(peerList[i]);
+    }
+    base::TaskCore::TaskState st;
+    st = tc->getTaskState();
     log(Debug) << "This component has state: " << st << endlog();
     std::string color;
     switch (st){
@@ -79,12 +88,12 @@ bool Dot::execute(){
     }
     m_dot << peerList[i] << "[style=filled,color=" << color << "];\n";
     comp_ports.clear();
-    comp_ports = this->getOwner()->getPeer(peerList[i])->ports()->getPortNames();
+    comp_ports = tc->ports()->getPortNames();
     for(unsigned int j=0; j < comp_ports.size(); j++){
       log(Debug) << "Ports: " << comp_ports[j] << endlog();
       // Only consider input ports
-      if(dynamic_cast<base::InputPortInterface*>(this->getOwner()->getPeer(peerList[i])->getPort(comp_ports[j])) != 0){
-        std::list<RTT::internal::ConnectionManager::ChannelDescriptor> chns = this->getOwner()->getPeer(peerList[i])->getPort(comp_ports[j])->getManager()->getChannels();
+      if(dynamic_cast<base::InputPortInterface*>(tc->getPort(comp_ports[j])) != 0){
+        std::list<RTT::internal::ConnectionManager::ChannelDescriptor> chns = tc->getPort(comp_ports[j])->getManager()->getChannels();
         std::list<RTT::internal::ConnectionManager::ChannelDescriptor>::iterator k;
         for(k=chns.begin(); k!= chns.end(); k++){
           base::ChannelElementBase::shared_ptr bs = k->get<1>();
@@ -122,7 +131,7 @@ bool Dot::execute(){
       }
       // Consider output ports that do not have a corresponding input port
       else{
-        std::list<RTT::internal::ConnectionManager::ChannelDescriptor> chns = this->getOwner()->getPeer(peerList[i])->getPort(comp_ports[j])->getManager()->getChannels();
+        std::list<RTT::internal::ConnectionManager::ChannelDescriptor> chns = tc->getPort(comp_ports[j])->getManager()->getChannels();
         std::list<RTT::internal::ConnectionManager::ChannelDescriptor>::iterator k;
         for(k=chns.begin(); k!= chns.end(); k++){
           base::ChannelElementBase::shared_ptr bs = k->get<1>();
