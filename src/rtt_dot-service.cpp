@@ -46,6 +46,8 @@ Dot::Dot(TaskContext* owner)
     this->addOperation("getOwnerName", &Dot::getOwnerName, this).doc("Returns the name of the owner of this object.");
     this->addOperation("generate", &Dot::execute, this).doc("Generate component overview and write to 'dot_file'.");
     this->addProperty("dot_file", m_dot_file).doc("File to write the generated dot syntax to.");
+    this->doc("Dot service interface.");
+    owner->engine()->runFunction(this);
 }
 
 std::string Dot::getOwnerName() {
@@ -122,11 +124,18 @@ bool Dot::execute(){
     }
   }
   m_dot << "}\n";
-  std::ofstream fl;
-  fl.open(m_dot_file.c_str());
-  fl << m_dot.str();
-  fl.close();
-  return true;
+  std::ofstream fl(m_dot_file.c_str());
+  if (fl.is_open()){
+    fl << m_dot.str();
+    fl.close();
+    return true;
+  }
+  else{
+    log(Warning) << "Unable to open file: " << m_dot_file << endlog();
+    return false;
+  }
+
+
 }
 
 ORO_SERVICE_NAMED_PLUGIN(Dot, "dot")
