@@ -134,10 +134,16 @@ bool Dot::execute(){
             m_dot << comp_in << "->" << "\"" << comp_in << "." << comp_out << "\"[label=\"" << port_in << "\"];\n";
             m_dot << "\"" << comp_in << "." << comp_out << "\"->" << comp_out << "[label=\"" << port_out << "\"];\n";\
           }
+          // Looks like a stream, although cp.name_id is empty?!
+          else if(comp_in.empty() && !comp_out.empty()){
+            // plot the channel element as a seperate box and connect input and output with it
+            m_dot << "\"." << comp_out << "\"[shape=box];\n";
+            m_dot << "\"." << comp_out << "\"->" << comp_out << "[label=\"" << port_out << "\"];\n";\
+          }
         }
       }
-      // Consider output ports that do not have a corresponding input port
       else{
+        log(Debug) << "This is an output port" << endlog();
         std::list<internal::ConnectionManager::ChannelDescriptor> chns = tc->getPort(comp_ports[j])->getManager()->getChannels();
         std::list<internal::ConnectionManager::ChannelDescriptor>::iterator k;
         for(k=chns.begin(); k!= chns.end(); k++){
