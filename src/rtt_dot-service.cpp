@@ -60,37 +60,49 @@ bool Dot::execute(){
   m_dot << "rankdir=LR; \n";
   std::vector<std::string> peerList = this->getOwner()->getPeerList();
   if(peerList.size() == 0){
-    log(Info) << "Component has no peers!" << endlog();
+    log(Debug) << "Component has no peers!" << endlog();
   }
   std::vector<std::string> comp_ports;
   for(unsigned int i=0; i<peerList.size(); i++){
-    log(Info) << "Component: " << peerList[i] << endlog();
+    log(Debug) << "Component: " << peerList[i] << endlog();
     m_dot << peerList[i] << ";\n";
     comp_ports.clear();
     comp_ports = this->getOwner()->getPeer(peerList[i])->ports()->getPortNames();
     for(unsigned int j=0; j < comp_ports.size(); j++){
-      log(Info) << "Ports: " << comp_ports[j] << endlog();
+      log(Debug) << "Ports: " << comp_ports[j] << endlog();
       // Only consider input ports
       if(dynamic_cast<base::InputPortInterface*>(this->getOwner()->getPeer(peerList[i])->getPort(comp_ports[j])) != 0){
         std::list<RTT::internal::ConnectionManager::ChannelDescriptor> chns = this->getOwner()->getPeer(peerList[i])->getPort(comp_ports[j])->getManager()->getChannels();
         std::list<RTT::internal::ConnectionManager::ChannelDescriptor>::iterator k;
         for(k=chns.begin(); k!= chns.end(); k++){
           base::ChannelElementBase::shared_ptr bs = k->get<1>();
+          ConnPolicy cp = k->get<2>();
           std::string comp_in, port_in;
           if(bs->getInputEndPoint()->getPort()!=0){
             comp_in = bs->getInputEndPoint()->getPort()->getInterface()->getOwner()->getName();
             port_in = bs->getInputEndPoint()->getPort()->getName();
           }
-          log(Info) << "Connection starts at: " << port_in << endlog();
+          log(Debug) << "Connection starts at: " << port_in << endlog();
           std::string comp_out, port_out;
           if(bs->getOutputEndPoint()->getPort()!=0){
             comp_out = bs->getOutputEndPoint()->getPort()->getInterface()->getOwner()->getName();
             port_out = bs->getOutputEndPoint()->getPort()->getName();
           }
-          log(Info) << "Connection ends at: " << port_out << endlog();
-          if(!comp_in.empty() && !comp_out.empty()){
+          log(Debug) << "Connection ends at: " << port_out << endlog();
+          // If the ConnPolicy has a non-empty name, use that name as the topic name
+          if(!cp.name_id.empty()){
+            std::string cp_out = cp.name_id;
+            // DOT does not handle "/" well, so we replace them with "_" here
+            boost::replace_all(cp_out,"/","_");
             // plot the channel element as a seperate box and connect input and output with it
-            m_dot << "\"" << comp_in << "." <<comp_out << "\"[shape=box];\n";
+            m_dot << cp_out << "[shape=box];\n";
+            m_dot << comp_in << "->" << cp_out << "[label=\"" << port_in << "\"];\n";
+            m_dot << cp_out << "->" << comp_out << "[label=\"" << port_out << "\"];\n";\
+          }
+          // Else, use a custom name: compInName.compOutName
+          else if(!comp_in.empty() && !comp_out.empty()){
+            // plot the channel element as a seperate box and connect input and output with it
+            m_dot << "\"" << comp_in << "." << comp_out << "\"[shape=box];\n";
             m_dot << comp_in << "->" << "\"" << comp_in << "." << comp_out << "\"[label=\"" << port_in << "\"];\n";
             m_dot << "\"" << comp_in << "." << comp_out << "\"->" << comp_out << "[label=\"" << port_out << "\"];\n";\
           }
@@ -102,19 +114,30 @@ bool Dot::execute(){
         std::list<RTT::internal::ConnectionManager::ChannelDescriptor>::iterator k;
         for(k=chns.begin(); k!= chns.end(); k++){
           base::ChannelElementBase::shared_ptr bs = k->get<1>();
+          ConnPolicy cp = k->get<2>();
           std::string comp_in, port_in;
           if(bs->getInputEndPoint()->getPort()!=0){
             comp_in = bs->getInputEndPoint()->getPort()->getInterface()->getOwner()->getName();
             port_in = bs->getInputEndPoint()->getPort()->getName();
           }
-          log(Info) << "Connection starts at: " << port_in << endlog();
+          log(Debug) << "Connection starts at: " << port_in << endlog();
           std::string comp_out, port_out;
           if(bs->getOutputEndPoint()->getPort()!=0){
             comp_out = bs->getOutputEndPoint()->getPort()->getInterface()->getOwner()->getName();
             port_out = bs->getOutputEndPoint()->getPort()->getName();
           }
-          log(Info) << "Connection ends at: " << port_out << endlog();
-          if(!comp_in.empty() && comp_out.empty()){
+          log(Debug) << "Connection ends at: " << port_out << endlog();
+          // If the ConnPolicy has a non-empty name, use that name as the topic name
+          if(!cp.name_id.empty()){
+            std::string cp_out = cp.name_id;
+            // DOT does not handle "/" well, so we replace them with "_" here
+            boost::replace_all(cp_out,"/","_");
+            // plot the channel element as a seperate box and connect input and output with it
+            m_dot << cp_out << "[shape=box];\n";
+            m_dot << comp_in << "->" << cp_out << "[label=\"" << port_in << "\"];\n";
+          }
+          // Else, use a custom name: compInName.compOutName
+          else if(!comp_in.empty() && comp_out.empty()){
             // plot the channel element as a seperate box and connect input and output with it
             m_dot << "\"" << comp_in << "." << comp_out << "\"[shape=box];\n";
             m_dot << comp_in << "->" << "\"" << comp_in << "." << comp_out << "\"[label=\"" << port_in << "\"];\n";
@@ -134,8 +157,5 @@ bool Dot::execute(){
     log(Warning) << "Unable to open file: " << m_dot_file << endlog();
     return false;
   }
-
-
 }
-
 ORO_SERVICE_NAMED_PLUGIN(Dot, "dot")
