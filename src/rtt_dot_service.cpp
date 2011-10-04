@@ -122,13 +122,10 @@ bool Dot::execute(){
           log(Debug) << "Connection ends at component: " << comp_out << endlog();
           // If the ConnPolicy has a non-empty name, use that name as the topic name
           if(!cp.name_id.empty()){
-            std::string cp_out = cp.name_id;
-            // DOT does not handle "/" well, so we replace them with "_" here
-            boost::replace_all(cp_out,"/","_");
             // plot the channel element as a seperate box and connect input and output with it
-            m_dot << cp_out << "[shape=box];\n";
-            m_dot << comp_in << "->" << cp_out << "[label=\"" << port_in << "\"];\n";
-            m_dot << cp_out << "->" << comp_out << "[label=\"" << port_out << "\"];\n";\
+            m_dot << "\"" << cp.name_id << "\"" << "[shape=box];\n";
+            m_dot << comp_in << "->" << "\"" << cp.name_id << "\"" << "[label=\"" << port_in << "\"];\n";
+            m_dot << "\"" << cp.name_id << "\"" << "->" << comp_out << "[label=\"" << port_out << "\"];\n";\
           }
           // Else, use a custom name: compInName.compOutName
           else if(!comp_in.empty() && !comp_out.empty()){
@@ -159,23 +156,16 @@ bool Dot::execute(){
             comp_out = bs->getOutputEndPoint()->getPort()->getInterface()->getOwner()->getName();
             port_out = bs->getOutputEndPoint()->getPort()->getName();
           }
-          log(Debug) << "Connection ends at: " << port_out << endlog();
-          // If the ConnPolicy has a non-empty name, use that name as the topic name
-          if(!cp.name_id.empty()){
-            std::string cp_out = cp.name_id;
-            // DOT does not handle "/" well, so we replace them with "_" here
-            boost::replace_all(cp_out,"/","_");
-            // plot the channel element as a seperate box and connect input and output with it
-            m_dot << cp_out << "[shape=box];\n";
-            m_dot << comp_in << "->" << cp_out << "[label=\"" << port_in << "\"];\n";
-          }
-          // Else, use a custom name: compInName.compOutName
-          else if(!comp_in.empty() && comp_out.empty()){
-            // plot the channel element as a seperate box and connect input and output with it
-            m_dot << "\"" << comp_in << "." << comp_out << "\"[shape=box];\n";
-            m_dot << comp_in << "->" << "\"" << comp_in << "." << comp_out << "\"[label=\"" << port_in << "\"];\n";
           log(Debug) << "Connection ends at port: " << port_out << endlog();
           log(Debug) << "Connection ends at component: " << comp_out << endlog();
+          // Consider only output ports that do not have a corresponding input port
+          if(comp_out.empty()){
+            // If the ConnPolicy has a non-empty name, use that name as the topic name
+            if(!cp.name_id.empty()){
+              // plot the channel element as a seperate box and connect input and output with it
+              m_dot << "\"" << cp.name_id << "\"" << "[shape=box];\n";
+              m_dot << comp_in << "->" << "\"" << cp.name_id << "\"" << "[label=\"" << port_in << "\"];\n";
+            }
           }
         }
       }
