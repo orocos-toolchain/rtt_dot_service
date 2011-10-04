@@ -119,13 +119,17 @@ bool Dot::execute(){
         log(Debug) << "Connection ends at port: " << port_out << endlog();
         log(Debug) << "Connection ends at component: " << comp_out << endlog();
         std::string conn_info;
+        stringstream ss;
         switch(cp.type){
-          case 0:
+        case ConnPolicy::DATA:
             conn_info = "data";
-          case 1:
-            stringstream ss;
+            break;
+        case ConnPolicy::BUFFER:
             ss << "buffer [ " << cp.size << " ]";
             conn_info = ss.str();
+            break;
+        default:
+            conn_info = "unknown";
         }
         log(Debug) << "Connection has conn_info: " << conn_info << endlog();
         // Only consider input ports
