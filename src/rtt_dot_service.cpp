@@ -105,6 +105,15 @@ bool Dot::execute(){
       log(Debug) << "Port: " << comp_ports[j] << endlog();
       std::list<internal::ConnectionManager::ChannelDescriptor> chns = tc->getPort(comp_ports[j])->getManager()->getChannels();
       std::list<internal::ConnectionManager::ChannelDescriptor>::iterator k;
+      if(chns.empty()){
+        log(Debug) << "Looks like we have an empty channel!" << endlog();
+        // Display unconnected ports as well!
+        m_dot << quote(comp_ports[j]) << "[shape=point];\n";
+        if(dynamic_cast<base::InputPortInterface*>(tc->getPort(comp_ports[j])) != 0)
+          m_dot << quote(comp_ports[j]) << "->" << peerList[i] << "[headport=n tailport=s label=" << quote(comp_ports[j]) << "];\n";
+        else
+          m_dot << peerList[i] << "->" << quote(comp_ports[j]) << "[headport=n tailport=s label=" << quote(comp_ports[j]) << "];\n";
+      }
       for(k=chns.begin(); k!= chns.end(); k++){
         base::ChannelElementBase::shared_ptr bs = k->get<1>();
         ConnPolicy cp = k->get<2>();
