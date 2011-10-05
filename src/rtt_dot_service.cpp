@@ -54,6 +54,11 @@ std::string Dot::getOwnerName() {
     return getOwner()->getName();
 }
 
+std::string Dot::quote(std::string const& name)
+{
+  return "\"" + name + "\"";
+}
+
 bool Dot::execute(){
   m_dot.str("");
   m_dot << "digraph G { \n";
@@ -91,7 +96,7 @@ bool Dot::execute(){
       case 6: color = "red"; break;
     }
     // Draw component as ellipse with color according to its TaskState
-    m_dot << peerList[i] << "[style=filled,color=" << color << "];\n";
+    m_dot << quote(peerList[i]) << "[style=filled,color=" << color << "];\n";
     comp_ports.clear();
     // Get all component ports
     comp_ports = tc->ports()->getPortNames();
@@ -145,22 +150,22 @@ bool Dot::execute(){
             // If the ConnPolicy has a non-empty name, use that name as the topic name
             if(!cp.name_id.empty()){
               // plot the channel element as a seperate box and connect input and output with it
-              m_dot << "\"" << cp.name_id << "\"" << "[shape=box label=\"" << cp.name_id << "\"];\n";
-              m_dot << comp_in << "->" << "\"" << cp.name_id << "\"" << "[headport=n tailport=s label=\"" << port_in << "\"];\n";
-              m_dot << "\"" << cp.name_id << "\"" << "->" << comp_out << "[headport=n tailport=s label=\"" << port_out << "\"];\n";\
+              m_dot << quote(cp.name_id) << "[shape=box label=" << quote(cp.name_id) << "];\n";
+              m_dot << quote(comp_in) << "->" << quote(cp.name_id) << "[headport=n tailport=s label=" << quote(port_in) << "];\n";
+              m_dot << quote(cp.name_id) << "->" << quote(comp_out) << "[headport=n tailport=s label=" << quote(port_out) << "];\n"; \
             }
             // Else, use a custom name: compInportIncompOutportOut
             else{
               // plot the channel element as a seperate box and connect input and output with it
-              m_dot << "\"" << comp_in << port_in << comp_out << port_out << "\"[shape=box label=\"" << conn_info << "\"];\n";
-              m_dot << comp_in << "->" << "\"" << comp_in << port_in << comp_out << port_out << "\"[headport=n tailport=s label=\"" << port_in << "\"];\n";
-              m_dot << "\"" << comp_in << port_in << comp_out << port_out << "\"->" << comp_out << "[headport=n tailport=s label=\"" << port_out << "\"];\n";\
+              m_dot << quote(comp_in + port_in + comp_out + port_out) << "[shape=box label=" << quote(conn_info) << "];\n";
+              m_dot << quote(comp_in) << "->" << quote(comp_in + port_in + comp_out + port_out) << "[headport=n tailport=s label=" << quote(port_in) << "];\n";
+              m_dot << quote(comp_in + port_in + comp_out + port_out) << "->" << comp_out << "[headport=n tailport=s label=" << quote(port_out) << "];\n"; \
             }
           }
           // Here, we have a stream?!
           else{
-            m_dot << "\"" << comp_out << port_out << "\"[shape=box label=\"" << conn_info << "\"];\n";
-            m_dot << "\"" << comp_out << port_out << "\"->" << comp_out << "[headport=n tailport=s label=\"" << port_out << "\"];\n";\
+            m_dot << quote(comp_out + port_out) << "[shape=box label=" << quote(conn_info) << "];\n";
+            m_dot << quote(comp_out + port_out) << "->" << quote(comp_out) << "[headport=n tailport=s label=" << quote(port_out) << "];\n"; \
           }
         }
         else{
@@ -169,13 +174,13 @@ bool Dot::execute(){
             // If the ConnPolicy has a non-empty name, use that name as the topic name
             if(!cp.name_id.empty()){
               // plot the channel element as a seperate box and connect input and output with it
-              m_dot << "\"" << cp.name_id << "\"" << "[shape=box label=\"" << cp.name_id << "\"];\n";
-              m_dot << comp_in << "->" << "\"" << cp.name_id << "\"" << "[headport=n tailport=s label=\"" << port_in << "\"];\n";
+              m_dot << quote(cp.name_id) << "[shape=box label=" << quote(cp.name_id) << "];\n";
+              m_dot << quote(comp_in) << "->" << quote(cp.name_id) << "[headport=n tailport=s label=" << quote(port_in) << "];\n";
             }
             else{
               // plot the channel element as a seperate box and connect input and output with it
-              m_dot << "\"" << comp_in << port_in << "\"[shape=box label=\"" << conn_info << "\"];\n";
-              m_dot << comp_in << "->" << "\"" << comp_in << port_in << "\"[headport=n tailport=s label=\"" << port_in << "\"];\n";
+              m_dot << quote(comp_in + port_in) << "[shape=box label=" << quote(conn_info) << "];\n";
+              m_dot << quote(comp_in) << "->" << quote( comp_in + port_in) << "[headport=n tailport=s label=" << quote(port_in) << "];\n";
             }
           }
         }
