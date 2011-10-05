@@ -14,4 +14,6 @@ Afterwards, visualisation of the dot file is possible, e.g. with the ROS xdot to
 
 rosrun xdot xdot.py orograph.dot
 
+The way components, connections and channels can be plotted can be tuned using the comp_args, conn_args and chan_args properties
+
 */

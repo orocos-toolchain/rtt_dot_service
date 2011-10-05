@@ -55,6 +55,9 @@ class Dot : public RTT::Service, public RTT::base::ExecutableInterface {
     bool execute();
     // Properties
     std::string m_dot_file;
+    std::string m_comp_args;
+    std::string m_conn_args;
+    std::string m_chan_args;
   private:
     std::stringstream m_dot;
     std::string quote(std::string const& name);
