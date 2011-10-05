@@ -106,14 +106,20 @@ bool Dot::execute(){
         log(Debug) << "Connection id: " << cp.name_id << endlog();
         std::string comp_in, port_in;
         if(bs->getInputEndPoint()->getPort()!=0){
-          comp_in = bs->getInputEndPoint()->getPort()->getInterface()->getOwner()->getName();
+          if (bs->getInputEndPoint()->getPort()->getInterface() != 0 )
+            comp_in = bs->getInputEndPoint()->getPort()->getInterface()->getOwner()->getName();
+          else
+            comp_in = "free input ports";
           port_in = bs->getInputEndPoint()->getPort()->getName();
         }
         log(Debug) << "Connection starts at port: " << port_in << endlog();
         log(Debug) << "Connection starts at component: " << comp_in << endlog();
         std::string comp_out, port_out;
         if(bs->getOutputEndPoint()->getPort()!=0){
-          comp_out = bs->getOutputEndPoint()->getPort()->getInterface()->getOwner()->getName();
+          if (bs->getOutputEndPoint()->getPort()->getInterface() != 0 )
+            comp_out = bs->getOutputEndPoint()->getPort()->getInterface()->getOwner()->getName();
+          else
+            comp_in = "free output ports";
           port_out = bs->getOutputEndPoint()->getPort()->getName();
         }
         log(Debug) << "Connection ends at port: " << port_out << endlog();
