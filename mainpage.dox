@@ -2,19 +2,25 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b The RTT dot service allows you to generate dot syntax showing deployed OROCOS components and their connections. To use it, load the service in your Deployer component, e.g. in your .ops script, add:
+\b The rtt_dot_service is an RTT service which generates a file in the [DOT language](http://www.graphviz.org/doc/info/lang.html) containing an overview of your current deployment configuration. It can be visualised with any DOT visualizer to give you an overview of:
+- all components currently deployed, together with their status information
+- all component ports (connected and unconnected), and how they are connected
+
+The service takes into account all peer components of the component in which you load the service. To get an overview of your complete deployment configuration, load this service in the Deployer component. You can trigger execution manually using the generate() function, but it will execute automatically with every component update as well (don't forget to attach an activity to your Deployer component!)
+
+To use it, load the service in your Deployer component, e.g. in your .ops script, add:
+
 <code>
 import ("rtt_dot")
 loadService("Deployer","dot")
 </code>
 
-The service has one property, dot_file, which you can adjust to the file you like to be generated. Generation is triggered by calling dot.generate, or by an update of the Deployer component.
+The service has a property, dot_file, which you can adjust to the file you like to be generated. The way components, connections and channels can be plotted can be tuned using the comp_args, conn_args and chan_args properties
 
-Afterwards, visualisation of the dot file is possible, e.g. with the ROS xdot tool:
+Visualisation of the dot file is possible, e.g. with the ROS xdot tool:
 
 rosrun xdot xdot.py orograph.dot
 
-The way components, connections and channels can be plotted can be tuned using the comp_args, conn_args and chan_args properties
 More information about the DOT language is available at
 
 http://www.graphviz.org/doc/info/lang.html and http://www.graphviz.org/Documentation/dotguide.pdf
