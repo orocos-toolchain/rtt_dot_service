@@ -52,12 +52,24 @@ class Dot : public RTT::Service, public RTT::base::ExecutableInterface {
     // Constructor
     Dot(TaskContext* owner);
     string getOwnerName();
+
+    /** \brief Generate DOT file for the current deployment configuration
+     *
+     *  The method iterates over all peer components and generates and writes out a DOT file giving an overview of the current deployment configuration. The file currently displays all peer components, colored according to their taskstate, all component ports, names and connections to other components.
+     */
     bool execute();
-    // Properties
+
+    /// @name Properties
+    //@{
+    /// Name of the DOT file to write the deployment configuration to
     std::string m_dot_file;
+    /// Additional arguments to pass to the component drawings
     std::string m_comp_args;
+    /// Additional arguments to pass to the connection drawings
     std::string m_conn_args;
+    /// Additional arguments to pass to the channel drawings
     std::string m_chan_args;
+    //@}
   private:
     std::stringstream m_dot;
     std::string quote(std::string const& name);

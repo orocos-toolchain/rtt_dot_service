@@ -2,8 +2,10 @@
   <description brief="Orocos rtt_dot_service package">
 
     The rtt_dot_service is an RTT service which generates a file in the <a href="http://www.graphviz.org/doc/info/lang.html"> DOT language format</a> containing an overview of your current deployment configuration. It can be visualised with any DOT visualizer to give you an overview of:
-      * all components currently deployed, together with their status information
-      * all component ports (connected and unconnected), and how they are connected
+    <ul>
+      <li> all components currently deployed, together with their status information </li>
+      <li> all component ports (connected and unconnected), and how they are connected </li>
+    </ul>
 
     The service takes into account all peer components of the component in which you load the service. To get an overview of your complete deployment configuration, load this service in the Deployer component. You can trigger execution manually using the generate() function, but it will execute automatically with every component update as well (don't forget to attach an activity to your Deployer component!)
 
@@ -23,8 +25,11 @@
     More information about the DOT language is available at http://www.graphviz.org/doc/info/lang.html and http://www.graphviz.org/Documentation/dotguide.pdf
 
   </description>
-  <license>LGPLv2.1/BSD</license>
   <author>Steven Bellens - steven.bellens@mech.kuleuven.be</author>
+  <license>LGPLv2.1 / BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/rtt_dot_service</url>
 
   <depend package="rtt" />
+
 </package>
