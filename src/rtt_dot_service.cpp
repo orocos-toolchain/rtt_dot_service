@@ -42,9 +42,9 @@
 Dot::Dot(TaskContext* owner)
     : Service("dot", owner), base::ExecutableInterface()
     ,m_dot_file("orograph.dot")
-    ,m_comp_args("style=filled,width=1.8,height=1.8")
-    ,m_conn_args("headport=n, tailport=s")
-    ,m_chan_args("shape=box")
+    ,m_comp_args("style=filled,width=1.8,height=1.8,")
+    ,m_conn_args(" ")
+    ,m_chan_args("shape=box,")
 {
     this->addOperation("getOwnerName", &Dot::getOwnerName, this).doc("Returns the name of the owner of this object.");
     this->addOperation("generate", &Dot::execute, this).doc("Generate component overview and write to 'dot_file'.");
@@ -102,7 +102,7 @@ bool Dot::execute(){
       case 6: color = "red"; break;
     }
     // Draw component with color according to its TaskState
-    m_dot << quote(peerList[i]) << "[" << m_comp_args << ",color=" << color << "];\n";
+    m_dot << quote(peerList[i]) << "[" << m_comp_args << "color=" << color << "];\n";
     comp_ports.clear();
     // Get all component ports
     comp_ports = tc->ports()->getPortNames();
@@ -116,9 +116,9 @@ bool Dot::execute(){
         // Display unconnected ports as well!
         m_dot << quote(comp_ports[j]) << "[shape=point];\n";
         if(dynamic_cast<base::InputPortInterface*>(tc->getPort(comp_ports[j])) != 0)
-          m_dot << quote(comp_ports[j]) << "->" << peerList[i] << "[" << m_conn_args << ",label=" << quote(comp_ports[j]) << "];\n";
+          m_dot << quote(comp_ports[j]) << "->" << peerList[i] << "[" << m_conn_args << "label=" << quote(comp_ports[j]) << "];\n";
         else
-          m_dot << peerList[i] << "->" << quote(comp_ports[j]) << "[" << m_conn_args << ",label=" << quote(comp_ports[j]) << "];\n";
+          m_dot << peerList[i] << "->" << quote(comp_ports[j]) << "[" << m_conn_args << "label=" << quote(comp_ports[j]) << "];\n";
       }
       for(k=chns.begin(); k!= chns.end(); k++){
         base::ChannelElementBase::shared_ptr bs = k->get<1>();
@@ -165,22 +165,22 @@ bool Dot::execute(){
             // If the ConnPolicy has a non-empty name, use that name as the topic name
             if(!cp.name_id.empty()){
               // plot the channel element as a seperate box and connect input and output with it
-              m_dot << quote(cp.name_id) << "[" << m_chan_args << ",label=" << quote(cp.name_id) << "];\n";
-              m_dot << quote(comp_in) << "->" << quote(cp.name_id) << "[" << m_conn_args << ",label=" << quote(port_in) << "];\n";
-              m_dot << quote(cp.name_id) << "->" << quote(comp_out) << "[" << m_conn_args << ",label=" << quote(port_out) << "];\n"; \
+              m_dot << quote(cp.name_id) << "[" << m_chan_args << "label=" << quote(cp.name_id) << "];\n";
+              m_dot << quote(comp_in) << "->" << quote(cp.name_id) << "[" << m_conn_args << "label=" << quote(port_in) << "];\n";
+              m_dot << quote(cp.name_id) << "->" << quote(comp_out) << "[" << m_conn_args << "label=" << quote(port_out) << "];\n"; \
             }
             // Else, use a custom name: compInportIncompOutportOut
             else{
               // plot the channel element as a seperate box and connect input and output with it
-              m_dot << quote(comp_in + port_in + comp_out + port_out) << "[" << m_chan_args << ",label=" << quote(conn_info) << "];\n";
-              m_dot << quote(comp_in) << "->" << quote(comp_in + port_in + comp_out + port_out) << "[" << m_conn_args << ",label=" << quote(port_in) << "];\n";
-              m_dot << quote(comp_in + port_in + comp_out + port_out) << "->" << comp_out << "[" << m_conn_args << ",label=" << quote(port_out) << "];\n"; \
+              m_dot << quote(comp_in + port_in + comp_out + port_out) << "[" << m_chan_args << "label=" << quote(conn_info) << "];\n";
+              m_dot << quote(comp_in) << "->" << quote(comp_in + port_in + comp_out + port_out) << "[" << m_conn_args << "label=" << quote(port_in) << "];\n";
+              m_dot << quote(comp_in + port_in + comp_out + port_out) << "->" << comp_out << "[" << m_conn_args << "label=" << quote(port_out) << "];\n"; \
             }
           }
           // Here, we have a stream?!
           else{
-            m_dot << quote(comp_out + port_out) << "[" << m_chan_args << ",label=" << quote(conn_info) << "];\n";
-            m_dot << quote(comp_out + port_out) << "->" << quote(comp_out) << "[" << m_conn_args << ",label=" << quote(port_out) << "];\n"; \
+            m_dot << quote(comp_out + port_out) << "[" << m_chan_args << "label=" << quote(conn_info) << "];\n";
+            m_dot << quote(comp_out + port_out) << "->" << quote(comp_out) << "[" << m_conn_args << "label=" << quote(port_out) << "];\n"; \
           }
         }
         else{
@@ -189,13 +189,13 @@ bool Dot::execute(){
             // If the ConnPolicy has a non-empty name, use that name as the topic name
             if(!cp.name_id.empty()){
               // plot the channel element as a seperate box and connect input and output with it
-              m_dot << quote(cp.name_id) << "[" << m_chan_args << ",label=" << quote(cp.name_id) << "];\n";
-              m_dot << quote(comp_in) << "->" << quote(cp.name_id) << "[" << m_conn_args << ",label=" << quote(port_in) << "];\n";
+              m_dot << quote(cp.name_id) << "[" << m_chan_args << "label=" << quote(cp.name_id) << "];\n";
+              m_dot << quote(comp_in) << "->" << quote(cp.name_id) << "[" << m_conn_args << "label=" << quote(port_in) << "];\n";
             }
             else{
               // plot the channel element as a seperate box and connect input and output with it
-              m_dot << quote(comp_in + port_in) << "[" << m_chan_args << ",label=" << quote(conn_info) << "];\n";
-              m_dot << quote(comp_in) << "->" << quote( comp_in + port_in) << "[" << m_conn_args << ",label=" << quote(port_in) << "];\n";
+              m_dot << quote(comp_in + port_in) << "[" << m_chan_args << "label=" << quote(conn_info) << "];\n";
+              m_dot << quote(comp_in) << "->" << quote( comp_in + port_in) << "[" << m_conn_args << "label=" << quote(port_in) << "];\n";
             }
           }
         }
