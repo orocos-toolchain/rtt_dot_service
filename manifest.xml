@@ -22,6 +22,15 @@
     rosrun xdot xdot.py orograph.dot
     }}}
 
+    Colors are used to display the component's current state:
+    <ul>
+      <li>Init - white</li>
+      <li>PreOperational - orange</li>
+      <li>FatalError, Exception, RunTimeError - red</li>
+      <li>Stopped - lightblue </li>
+      <li>Running - green</li>
+    </ul>
+
     More information about the DOT language is available at http://www.graphviz.org/doc/info/lang.html and http://www.graphviz.org/Documentation/dotguide.pdf
 
   </description>
