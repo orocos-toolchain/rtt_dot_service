@@ -8,7 +8,7 @@ if (ROS_ROOT)
   set(ROS_BUILD_TYPE Debug)
   rosbuild_init()
   rosbuild_find_ros_package( rtt )
-  set( RTT_HINTS HINTS ${rtt_PACKAGE_PATH}/../install )
+  set( RTT_HINTS HINTS ${rtt_PACKAGE_PATH}/install )
 endif()
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
