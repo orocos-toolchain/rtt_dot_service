@@ -51,7 +51,7 @@ class Dot : public RTT::Service, public RTT::base::ExecutableInterface {
   public:
     // Constructor
     Dot(TaskContext* owner);
-    string getOwnerName();
+    std::string getOwnerName();
 
     /** \brief Generate DOT file for the current deployment configuration
      *

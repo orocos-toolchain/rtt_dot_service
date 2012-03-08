@@ -60,8 +60,7 @@ std::string Dot::getOwnerName() {
     return getOwner()->getName();
 }
 
-std::string Dot::quote(std::string const& name)
-{
+std::string Dot::quote(std::string const& name){
   return "\"" + name + "\"";
 }
 
@@ -78,13 +77,14 @@ bool Dot::execute(){
   }
   std::vector<std::string> comp_ports;
   // Loop over all peers + own component
-  for(unsigned int i=0; i<peerList.size(); i++){
+  for(unsigned int i = 0; i < peerList.size(); i++){
     log(Debug) << "Component: " << peerList[i] << endlog();
     // Get a pointer to the taskcontext, which can be either a peer or the component itself.
     TaskContext* tc;
-    if(this->getOwner()->getPeer(peerList[i])==0){
+    if(this->getOwner()->getPeer(peerList[i]) == 0){
       tc = this->getOwner();
-    } else{
+    }
+    else{
       tc = this->getOwner()->getPeer(peerList[i]);
     }
     // Get the component state
@@ -107,7 +107,7 @@ bool Dot::execute(){
     // Get all component ports
     comp_ports = tc->ports()->getPortNames();
     // Loop over all ports
-    for(unsigned int j=0; j < comp_ports.size(); j++){
+    for(unsigned int j = 0; j < comp_ports.size(); j++){
       log(Debug) << "Port: " << comp_ports[j] << endlog();
       std::list<internal::ConnectionManager::ChannelDescriptor> chns = tc->getPort(comp_ports[j])->getManager()->getChannels();
       std::list<internal::ConnectionManager::ChannelDescriptor>::iterator k;
@@ -115,37 +115,43 @@ bool Dot::execute(){
         log(Debug) << "Looks like we have an empty channel!" << endlog();
         // Display unconnected ports as well!
         m_dot << quote(comp_ports[j]) << "[shape=point];\n";
-        if(dynamic_cast<base::InputPortInterface*>(tc->getPort(comp_ports[j])) != 0)
+        if(dynamic_cast<base::InputPortInterface*>(tc->getPort(comp_ports[j])) != 0){
           m_dot << quote(comp_ports[j]) << "->" << peerList[i] << "[" << m_conn_args << "label=" << quote(comp_ports[j]) << "];\n";
-        else
+        }
+        else{
           m_dot << peerList[i] << "->" << quote(comp_ports[j]) << "[" << m_conn_args << "label=" << quote(comp_ports[j]) << "];\n";
+        }
       }
-      for(k=chns.begin(); k!= chns.end(); k++){
+      for(k = chns.begin(); k != chns.end(); k++){
         base::ChannelElementBase::shared_ptr bs = k->get<1>();
         ConnPolicy cp = k->get<2>();
         log(Debug) << "Connection id: " << cp.name_id << endlog();
         std::string comp_in, port_in;
-        if(bs->getInputEndPoint()->getPort()!=0){
-          if (bs->getInputEndPoint()->getPort()->getInterface() != 0 )
+        if(bs->getInputEndPoint()->getPort() != 0){
+          if (bs->getInputEndPoint()->getPort()->getInterface() != 0 ){
             comp_in = bs->getInputEndPoint()->getPort()->getInterface()->getOwner()->getName();
-          else
+          }
+          else{
             comp_in = "free input ports";
+          }
           port_in = bs->getInputEndPoint()->getPort()->getName();
         }
         log(Debug) << "Connection starts at port: " << port_in << endlog();
         log(Debug) << "Connection starts at component: " << comp_in << endlog();
         std::string comp_out, port_out;
-        if(bs->getOutputEndPoint()->getPort()!=0){
-          if (bs->getOutputEndPoint()->getPort()->getInterface() != 0 )
+        if(bs->getOutputEndPoint()->getPort() != 0){
+          if (bs->getOutputEndPoint()->getPort()->getInterface() != 0 ){
             comp_out = bs->getOutputEndPoint()->getPort()->getInterface()->getOwner()->getName();
-          else
+          }
+          else{
             comp_in = "free output ports";
+          }
           port_out = bs->getOutputEndPoint()->getPort()->getName();
         }
         log(Debug) << "Connection ends at port: " << port_out << endlog();
         log(Debug) << "Connection ends at component: " << comp_out << endlog();
         std::string conn_info;
-        stringstream ss;
+        std::stringstream ss;
         switch(cp.type){
         case ConnPolicy::DATA:
             conn_info = "data";
