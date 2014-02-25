@@ -1,5 +1,8 @@
 <package>
-  <description brief="Orocos rtt_dot_service package">
+  <name>rtt_dot_service</name>
+  <version>0.0.1</version>
+  <description >
+    Orocos rtt_dot_service package
 
     The rtt_dot_service is an RTT service which generates a file in the <a href="http://www.graphviz.org/doc/info/lang.html"> DOT language format</a> containing an overview of your current deployment configuration. It can be visualised with any DOT visualizer to give you an overview of:
     <ul>
@@ -34,11 +37,13 @@
     More information about the DOT language is available at http://www.graphviz.org/doc/info/lang.html and http://www.graphviz.org/Documentation/dotguide.pdf
 
   </description>
+  <maintainer email="steven.bellens@mech.kuleuven.be" >Steven Bellens</maintainer>
   <author>Steven Bellens - steven.bellens@mech.kuleuven.be</author>
   <license>LGPLv2.1 / BSD</license>
-  <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/rtt_dot_service</url>
 
-  <depend package="rtt" />
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rtt</build_depend>
+  <run_depend>rtt</run_depend>
 
 </package>
