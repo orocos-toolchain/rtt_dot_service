@@ -72,6 +72,8 @@ class Dot : public RTT::Service, public RTT::base::ExecutableInterface {
     //@}
   private:
     std::stringstream m_dot;
+    std::string mpeer;
     std::string quote(std::string const& name);
+    void scanService(std::string path, Service::shared_ptr sv);
 };
 #endif

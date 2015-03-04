@@ -12,14 +12,28 @@
     To use it, load the service in your Deployer component, e.g. in your .ops script, add:
 
     {{{
-      import ("rtt_dot")
+      import ("rtt_dot_service")
       loadService("Deployer","dot")
     }}}
+
+    or equivalently in a .lua script:
+
+    {{{
+      depl:import ("rtt_dot_service")
+      depl:loadService("Deployer","dot")
+    }}}
+
 
     The service has a property, dot_file, which you can adjust to the file you like to be generated. The way components, connections and channels can be plotted can be tuned using the comp_args, conn_args and chan_args properties. Visualisation of the dot file is possible, e.g. with the ROS xdot tool:
 
     {{{
     rosrun xdot xdot.py orograph.dot
+    }}}
+
+    Or in Fuerte or later:
+
+    {{{
+     python $(rospack find xdot)/bin/dot_viewer.py orograph.dot
     }}}
 
     Colors are used to display the component's current state:

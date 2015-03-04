@@ -64,62 +64,26 @@ std::string Dot::quote(std::string const& name){
   return "\"" + name + "\"";
 }
 
-bool Dot::execute(){
-  m_dot.str("");
-  m_dot << "digraph G { \n";
-  m_dot << "rankdir=TB; \n";
-  // List all peers of this component
-  std::vector<std::string> peerList = this->getOwner()->getPeerList();
-  // Add the component itself as well
-  peerList.push_back(this->getOwner()->getName());
-  if(peerList.size() == 0){
-    log(Debug) << "Component has no peers!" << endlog();
-  }
-  std::vector<std::string> comp_ports;
-  // Loop over all peers + own component
-  for(unsigned int i = 0; i < peerList.size(); i++){
-    log(Debug) << "Component: " << peerList[i] << endlog();
-    // Get a pointer to the taskcontext, which can be either a peer or the component itself.
-    TaskContext* tc;
-    if(this->getOwner()->getPeer(peerList[i]) == 0){
-      tc = this->getOwner();
-    }
-    else{
-      tc = this->getOwner()->getPeer(peerList[i]);
-    }
-    // Get the component state
-    base::TaskCore::TaskState st;
-    st = tc->getTaskState();
-    log(Debug) << "This component has state: " << st << endlog();
-    std::string color;
-    switch (st){
-      case 0: color = "white"; break;
-      case 1: color = "orange"; break;
-      case 2: color = "red"; break;
-      case 3: color = "red"; break;
-      case 4: color = "lightblue"; break;
-      case 5: color = "green"; break;
-      case 6: color = "red"; break;
-    }
-    // Draw component with color according to its TaskState
-    m_dot << quote(peerList[i]) << "[" << m_comp_args << "color=" << color << "];\n";
+void Dot::scanService(std::string path, Service::shared_ptr sv)
+{
+    std::vector<std::string> comp_ports;
     comp_ports.clear();
     // Get all component ports
-    comp_ports = tc->ports()->getPortNames();
+    comp_ports = sv->getPortNames();
     // Loop over all ports
     for(unsigned int j = 0; j < comp_ports.size(); j++){
       log(Debug) << "Port: " << comp_ports[j] << endlog();
-      std::list<internal::ConnectionManager::ChannelDescriptor> chns = tc->getPort(comp_ports[j])->getManager()->getChannels();
+      std::list<internal::ConnectionManager::ChannelDescriptor> chns = sv->getPort(comp_ports[j])->getManager()->getChannels();
       std::list<internal::ConnectionManager::ChannelDescriptor>::iterator k;
       if(chns.empty()){
         log(Debug) << "Looks like we have an empty channel!" << endlog();
         // Display unconnected ports as well!
         m_dot << quote(comp_ports[j]) << "[shape=point];\n";
-        if(dynamic_cast<base::InputPortInterface*>(tc->getPort(comp_ports[j])) != 0){
-          m_dot << quote(comp_ports[j]) << "->" << peerList[i] << "[" << m_conn_args << "label=" << quote(comp_ports[j]) << "];\n";
+        if(dynamic_cast<base::InputPortInterface*>(sv->getPort(comp_ports[j])) != 0){
+          m_dot << quote(comp_ports[j]) << "->" << mpeer << "[" << m_conn_args << "label=" << quote(comp_ports[j]) << "];\n";
         }
         else{
-          m_dot << peerList[i] << "->" << quote(comp_ports[j]) << "[" << m_conn_args << "label=" << quote(comp_ports[j]) << "];\n";
+          m_dot << mpeer << "->" << quote(comp_ports[j]) << "[" << m_conn_args << "label=" << quote(comp_ports[j]) << "];\n";
         }
       }
       for(k = chns.begin(); k != chns.end(); k++){
@@ -144,7 +108,7 @@ bool Dot::execute(){
             comp_out = bs->getOutputEndPoint()->getPort()->getInterface()->getOwner()->getName();
           }
           else{
-            comp_in = "free output ports";
+            comp_out = "free output ports";
           }
           port_out = bs->getOutputEndPoint()->getPort()->getName();
         }
@@ -160,12 +124,16 @@ bool Dot::execute(){
             ss << "buffer [ " << cp.size << " ]";
             conn_info = ss.str();
             break;
+        case ConnPolicy::CIRCULAR_BUFFER:
+            ss << "circbuffer [ " << cp.size << " ]";
+            conn_info = ss.str();
+            break;
         default:
             conn_info = "unknown";
         }
         log(Debug) << "Connection has conn_info: " << conn_info << endlog();
         // Only consider input ports
-        if(dynamic_cast<base::InputPortInterface*>(tc->getPort(comp_ports[j])) != 0){
+        if(dynamic_cast<base::InputPortInterface*>(sv->getPort(comp_ports[j])) != 0){
           // First, consider regular connections
           if(!comp_in.empty()){
             // If the ConnPolicy has a non-empty name, use that name as the topic name
@@ -173,20 +141,20 @@ bool Dot::execute(){
               // plot the channel element as a seperate box and connect input and output with it
               m_dot << quote(cp.name_id) << "[" << m_chan_args << "label=" << quote(cp.name_id) << "];\n";
               m_dot << quote(comp_in) << "->" << quote(cp.name_id) << "[" << m_conn_args << "label=" << quote(port_in) << "];\n";
-              m_dot << quote(cp.name_id) << "->" << quote(comp_out) << "[" << m_conn_args << "label=" << quote(port_out) << "];\n"; \
+              m_dot << quote(cp.name_id) << "->" << quote(comp_out) << "[" << m_conn_args << "label=" << quote(port_out) << "];\n";
             }
             // Else, use a custom name: compInportIncompOutportOut
             else{
               // plot the channel element as a seperate box and connect input and output with it
               m_dot << quote(comp_in + port_in + comp_out + port_out) << "[" << m_chan_args << "label=" << quote(conn_info) << "];\n";
               m_dot << quote(comp_in) << "->" << quote(comp_in + port_in + comp_out + port_out) << "[" << m_conn_args << "label=" << quote(port_in) << "];\n";
-              m_dot << quote(comp_in + port_in + comp_out + port_out) << "->" << comp_out << "[" << m_conn_args << "label=" << quote(port_out) << "];\n"; \
+              m_dot << quote(comp_in + port_in + comp_out + port_out) << "->" << comp_out << "[" << m_conn_args << "label=" << quote(port_out) << "];\n";
             }
           }
           // Here, we have a stream?!
           else{
             m_dot << quote(comp_out + port_out) << "[" << m_chan_args << "label=" << quote(conn_info) << "];\n";
-            m_dot << quote(comp_out + port_out) << "->" << quote(comp_out) << "[" << m_conn_args << "label=" << quote(port_out) << "];\n"; \
+            m_dot << quote(comp_out + port_out) << "->" << quote(comp_out) << "[" << m_conn_args << "label=" << quote(port_out) << "];\n";
           }
         }
         else{
@@ -204,9 +172,61 @@ bool Dot::execute(){
               m_dot << quote(comp_in) << "->" << quote( comp_in + port_in) << "[" << m_conn_args << "label=" << quote(port_in) << "];\n";
             }
           }
+          else {
+              log(Debug) << "Dropped " << conn_info << " from " << comp_out + port_out << " to " << comp_in + port_in << endlog();
+          }
         }
       }
     }
+    // Recurse:
+    Service::ProviderNames providers = sv->getProviderNames();
+    for(Service::ProviderNames::iterator it=providers.begin(); it != providers.end(); ++it) {
+        scanService(path + "." + sv->getName(), sv->provides(*it) );
+    }
+}
+
+
+bool Dot::execute(){
+  m_dot.str("");
+  m_dot << "digraph G { \n";
+  m_dot << "rankdir=TB; \n";
+  // List all peers of this component
+  std::vector<std::string> peerList = this->getOwner()->getPeerList();
+  // Add the component itself as well
+  peerList.push_back(this->getOwner()->getName());
+  if(peerList.size() == 0){
+    log(Debug) << "Component has no peers!" << endlog();
+  }
+  // Loop over all peers + own component
+  for(unsigned int i = 0; i < peerList.size(); i++){
+    mpeer = peerList[i];
+    log(Debug) << "Component: " << mpeer << endlog();
+    // Get a pointer to the taskcontext, which can be either a peer or the component itself.
+    TaskContext* tc;
+    if(this->getOwner()->getPeer(mpeer) == 0){
+      tc = this->getOwner();
+    }
+    else{
+      tc = this->getOwner()->getPeer(mpeer);
+    }
+    // Get the component state
+    base::TaskCore::TaskState st;
+    st = tc->getTaskState();
+    log(Debug) << "This component has state: " << st << endlog();
+    std::string color;
+    switch (st){
+      case 0: color = "white"; break;
+      case 1: color = "orange"; break;
+      case 2: color = "red"; break;
+      case 3: color = "red"; break;
+      case 4: color = "lightblue"; break;
+      case 5: color = "green"; break;
+      case 6: color = "red"; break;
+    }
+    // Draw component with color according to its TaskState
+    m_dot << quote(mpeer) << "[" << m_comp_args << "color=" << color << "];\n";
+    // Draw in/out ports
+    scanService("",tc->provides());
   }
   m_dot << "}\n";
   std::ofstream fl(m_dot_file.c_str());
