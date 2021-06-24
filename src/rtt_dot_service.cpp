@@ -73,7 +73,7 @@ void Dot::scanService(std::string path, Service::shared_ptr sv)
     // Loop over all ports
     for(unsigned int j = 0; j < comp_ports.size(); j++){
       log(Debug) << "Port: " << comp_ports[j] << endlog();
-      std::list<internal::ConnectionManager::ChannelDescriptor> chns = sv->getPort(comp_ports[j])->getManager()->getChannels();
+      std::list<internal::ConnectionManager::ChannelDescriptor> chns = sv->getPort(comp_ports[j])->getManager()->getConnections();
       std::list<internal::ConnectionManager::ChannelDescriptor>::iterator k;
       if(chns.empty()){
         log(Debug) << "Looks like we have an empty channel!" << endlog();
