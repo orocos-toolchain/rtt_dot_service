@@ -1,6 +1,6 @@
 # OROCOS dot service
 
-_This branch is meant to be used in the contex of the rtt_ros2 integration._
+_This branch is meant to be used in the context of the rtt_ros2 integration._
 
 The rtt_dot_service is an RTT service which generates a file in the [DOT language format]("http://www.graphviz.org/doc/info/lang.html") containing an overview of your current deployment configuration.
  It can be visualised with any DOT visualizer to give you an overview of:
@@ -30,11 +30,12 @@ xdot orograph.dot
 ```
 
 Colors are used to display the component's current state:
-     - Init - **white**
-     - PreOperational - **orange**
-     - FatalError, Exception, RunTimeError - **red**
-     - Stopped - **lightblue** 
-     - Running - **green**
+
+   - Init - **white**
+   - PreOperational - **orange**
+   - FatalError, Exception, RunTimeError - **red**
+   - Stopped - **lightblue** 
+   - Running - **green**
 
 
 More information about the DOT language is available at http://www.graphviz.org/doc/info/lang.html and http://www.graphviz.org/Documentation/dotguide.pdf
