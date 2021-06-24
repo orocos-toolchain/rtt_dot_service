@@ -1,6 +1,6 @@
 # OROCOS dot service
 
-_This branch is meant to be used in the contex of the rtt_ros integration._
+_This branch is meant to be used in the context of the rtt_ros integration._
 
 Use the ros2 branch for ROS2-based installations.
 
