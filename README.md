@@ -33,11 +33,12 @@ The service has a property, `dot_file`, which you can adjust to the file you lik
 ```
 
 Colors are used to display the component's current state:
-     - Init - **white**
-     - PreOperational - **orange**
-     - FatalError, Exception, RunTimeError - **red**
-     - Stopped - **lightblue** 
-     - Running - **green**
+
+   - Init - **white**
+   - PreOperational - **orange**
+   - FatalError, Exception, RunTimeError - **red**
+   - Stopped - **lightblue** 
+   - Running - **green**
 
 
 More information about the DOT language is available at http://www.graphviz.org/doc/info/lang.html and http://www.graphviz.org/Documentation/dotguide.pdf
