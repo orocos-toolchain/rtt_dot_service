@@ -20,12 +20,14 @@ To use it, load the service in your Deployer component, e.g. in your .ops script
     loadService("Deployer","dot")
 ```
 
-    or equivalently in a .lua script:
+or equivalently in a .lua script:
 
  ```
       rtt.provides("ros"):import("rtt_dot_service")
       depl:loadService("Deployer","dot")
 ```
+
+To generate the graph, either set a period to the deployer, or trigger manually (`depl:trigger()`)
 
 The service has a property, `dot_file`, which you can adjust to the file you like to be generated. The way components, connections and channels can be plotted can be tuned using the comp_args, conn_args and chan_args properties. Visualisation of the dot file is possible, e.g. with  xdot:
 ```
